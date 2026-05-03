@@ -1,3 +1,5 @@
 .env
 database.db
 __pycache__
+fastapi_ornek.py 
+sqlmodel_ornek.py 
