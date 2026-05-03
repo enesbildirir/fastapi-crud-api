@@ -95,6 +95,7 @@ def soru(soru: Soru, dep = Depends(api_key_dogrula)):
     response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
+            {"role": "system", "content": "Sen bir finansal analistsin. Kullanıcının sorularını borsa ve finans perspektifinden yanıtla."},,
             {"role": "user", "content": soru.metin}
         ]
     )
