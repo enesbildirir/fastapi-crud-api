@@ -2,3 +2,4 @@ fastapi
 sqlmodel
 python-dotenv
 uvicorn
+openai
