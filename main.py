@@ -1,13 +1,17 @@
+from fastapi.openapi.utils import status_code_ranges
 import os
 from dotenv import load_dotenv
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from fastapi import Depends, FastAPI, HTTPException, Query, Request, Header
 from sqlmodel import Field, Session, SQLModel, create_engine, select
+from openai import OpenAI
 
 load_dotenv()
 
 API_KEY = os.getenv("API_KEY")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+client = OpenAI(api_key=OPENAI_API_KEY)
 
 class User(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
@@ -19,6 +23,9 @@ class UserCreate(SQLModel):
     name: str
     email: str
     age: int | None = None
+
+class Soru(SQLModel):
+    metin: str
 
 def get_session():
     with Session(engine) as session:
@@ -82,3 +89,14 @@ async def validation_handler(request: Request, exc: RequestValidationError):
         status_code=400,
         content={"hatalar": hatalar}
     )
+
+@app.post("/soru")
+def soru(soru: Soru, dep = Depends(api_key_dogrula)):
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "user", "content": soru.metin}
+        ]
+    )
+    cevap = response.choices[0].message.content
+    return {"cevap": cevap}
